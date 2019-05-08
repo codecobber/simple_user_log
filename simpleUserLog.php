@@ -3,8 +3,8 @@
 session_start();
 
 /*
-Plugin Name: Simple Access
-Description: Restrict user access for certain pages
+Plugin Name: Simple User Log
+Description: Show which users are logged in
 Version: 1.0
 Author: Code Cobber
 Author URI: https://www.codecobber.co.uk/
