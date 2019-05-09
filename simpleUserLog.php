@@ -3,8 +3,8 @@
 session_start();
 
 /*
-Plugin Name: Simple User Log
-Description: Show which users are logged in
+Plugin Name: Simple Access
+Description: Restrict user access for certain pages
 Version: 1.0
 Author: Code Cobber
 Author URI: https://www.codecobber.co.uk/
@@ -39,28 +39,29 @@ add_action('simple_user_log_tab', 'createSideMenu', array($thisfile, '<i class="
 
 
 function notLoggedIn(){
-	$myUsersfile2 = file_get_contents(constant('simple_user_log_path')) or die("Unable to open file!");
-	$JUsers2 = json_decode($myUsersfile2);
+	if(file_exists(constant('simple_user_log_path')) == 1){
+		$myUsersfile2 = file_get_contents(constant('simple_user_log_path')) or die("Unable to open file!");
+		$JUsers2 = json_decode($myUsersfile2);
 
-	if(isset($_SESSION['sur'])){
-		foreach ($JUsers2 as $jukey2 => $juvalue2){
+		if(isset($_SESSION['sur'])){
+			foreach ($JUsers2 as $jukey2 => $juvalue2){
 
-			//remove a count value of one when user logs out
-			if($juvalue2->name == $_SESSION['sur']){
-				if($juvalue2->count >0){
-					echo "Match and count";
-					$juvalue2->count = $juvalue2->count -1;
-					//update file
-					$JUsers2 = json_encode($JUsers2,JSON_PRETTY_PRINT);
-					file_put_contents(constant('simple_user_log_path'),$JUsers2) or die('Problem writing to file');
-					break;
+				//remove a count value of one when user logs out
+				if($juvalue2->name == $_SESSION['sur']){
+					if($juvalue2->count >0){
+						$juvalue2->count = $juvalue2->count -1;
+						//update file
+						$JUsers2 = json_encode($JUsers2,JSON_PRETTY_PRINT);
+						file_put_contents(constant('simple_user_log_path'),$JUsers2) or die('Problem writing to file');
+						break;
+					}
 				}
 			}
-		}
-		// close the sessions ready for a clean start
-		unset($_SESSION['sur']);
-		if(isset($_SESSION['surcount'])){
-			unset($_SESSION['surcount']);
+			// close the sessions ready for a clean start
+			unset($_SESSION['sur']);
+			if(isset($_SESSION['surcount'])){
+				unset($_SESSION['surcount']);
+			}
 		}
 	}
 }
@@ -93,9 +94,6 @@ function getLoggInData(){
 		$jenc = json_encode($JUsers,JSON_PRETTY_PRINT);
 		file_put_contents(constant('simple_user_log_path'),$jenc) or die("can't write to file");
 		$userFound_flag = 0;
-	}
-	else{
-		file_put_contents(constant('simple_user_log_path'),$jenc) or die("can't write to file");
 	}
 
 } //close getLoggInData
@@ -131,11 +129,17 @@ function simple_user_log_show(){
 			$JusersLF = json_decode($usersLF);
 
 			foreach ($JusersLF as $jukey => $juvalue) {
-					echo"<p><b>".$juvalue->name." - ".$juvalue->count."</p>";
+					echo"<p style='border-bottom:dotted 1px #ccc9c9;padding-bottom:6px;'><b>".$juvalue->name." - ".$juvalue->count."</p>";
 			}
 		}
 		else{
-			echo "<p>THE LOG FILE APPEARS TO BE MISSING!</p>";
+			echo "<p><b>THE LOG FILE APPEARS TO BE MISSING! </b></p>
+			<p><b> . . . Creating new file now . . .</b></p>
+			<p style='color:red; font-weight:bold;'>PLEASE LOG OUT AND LOG BACK IN TO UPDATE THE NEW FILE</p>";
+			$newArr = array();
+			$newLog = json_encode($newArr,JSON_PRETTY_PRINT);
+			file_put_contents(constant('simple_user_log_path'),$newLog) or die("can't write to file");
+
 		}
 
 
