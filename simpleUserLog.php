@@ -3,7 +3,7 @@
 session_start();
 
 /*
-Plugin Name: Simple Access
+Plugin Name: Simple User Log
 Description: Restrict user access for certain pages
 Version: 1.0
 Author: Code Cobber
